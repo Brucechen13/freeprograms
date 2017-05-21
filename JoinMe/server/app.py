@@ -42,9 +42,9 @@ def getUserInfo():
     else:
         return 'Hello John Doe'
 
-@app.route('/train/register')
+@app.route('/user/register')
 def registerUser():
-    if findUser(request.args.get('registerusername')):
+    if findUser(request.args.get('phonenumber')):
         return "already used"
     return "register success"
 
@@ -67,5 +67,3 @@ def not_found(error=None):
 
 if __name__ == "__main__":
     app.run(port=8888)
-    #with open("static/IMG_20161231_153230.jpg", 'rb') as f:
-     #   print(f.read())    
