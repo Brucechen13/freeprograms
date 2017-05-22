@@ -1,15 +1,17 @@
 ﻿import time,random,json
 from flask import Flask, render_template,make_response, Response,request,jsonify
 import pymysql
+from user import User
 
 
 app = Flask(__name__)
 app.debug = True
 
+global conn
 # 创建连接
 def conMysql():
+    global conn
     conn = pymysql.connect(host='127.0.0.1', port=3305, user='root', passwd='123456', db='test', charset='utf8')
-    print(conn)
     
 
 def savePic(picData):
@@ -44,11 +46,13 @@ def getUserInfo():
 
 @app.route('/user/register')
 def registerUser():
-    if findUser(request.args.get('phonenumber')):
-        return "already used"
-    return "register success"
+    user = User(conn)
+    phone = request.args.get('phone')
+    password = request.args.get('password')
+    return jsonify(user.registerUser(phone, password))
 
-@app.route('/activity/getall'):
+@app.route('/activity/getall')
+def getAllactivity():
     if userid in users:
         users = {'1':'john', '2':'steve', '3':'bill'}
         return jsonify({userid:users[userid]})
@@ -66,4 +70,5 @@ def not_found(error=None):
     return resp
 
 if __name__ == "__main__":
+    conMysql()
     app.run(port=8888)
