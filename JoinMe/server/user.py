@@ -4,6 +4,17 @@ import json
 class User:
     def __init__(self, conn):
         self._conn = conn
+    
+    def parseUser(self, row):
+        user = {}
+        user['id'] = str(row[0])  
+        user['phone'] = row[1]  
+        user['password'] = row[2]
+        names = ['username', 'gender', 'age', 'address', 'career']
+        for i in range(3,7):
+            if row[i] != None:
+                user[names[i-3]] = row[i]
+        return user
         
     def registerUser(self, phoneNumber, password):
         if self.getUser(phoneNumber) == None:
@@ -16,11 +27,22 @@ class User:
                     self._conn.commit()
                     return json.dumps({'phone':phoneNumber})
             except Exception:
-                return json.dump({'err':'未知错误'})
+                return json.dumps({'err':'未知错误'})
             #finally:
             #    self._conn.close();
         else:
-            return json.dumps({'err':'手机号已经注册'}) 
+            return json.dumps({'err':'手机号已经注册'})
+        
+    def loginUser(self, phoneNumber, password):
+        try:
+            with self._conn.cursor() as cursor:
+                sql = 'select * from users where phoneno = %s and password = %s'
+                cursor.execute(sql, (phoneNumber, password))
+                result = cursor.fetchone()            
+                self._conn.commit()
+                return self.parseUser(result)
+        except Exception as e:
+            return json.dumps({'err':str(e)})
     
     def getUser(self, phoneNumber):
         try:
@@ -31,7 +53,7 @@ class User:
                 self._conn.commit()
                 return result
         except Exception:
-            return json.dump({'err':'未知错误'})        
+            return json.dumps({'err':'未知错误'})        
         #finally:
         #    self._conn.close();     
 #global conn

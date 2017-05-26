@@ -3,6 +3,11 @@ from flask import Flask, render_template,make_response, Response,request,jsonify
 import pymysql
 from user import User
 
+#注册用户
+#获取用户信息
+#发布活动
+#发布动态
+
 
 app = Flask(__name__)
 app.debug = True
@@ -50,6 +55,13 @@ def registerUser():
     phone = request.args.get('phone')
     password = request.args.get('password')
     return jsonify(user.registerUser(phone, password))
+
+@app.route('/user/login')
+def loginUser():
+    user = User(conn)
+    phone = request.args.get('phone')
+    password = request.args.get('password')
+    return jsonify(user.loginUser(phone, password))    
 
 @app.route('/activity/getall')
 def getAllactivity():
