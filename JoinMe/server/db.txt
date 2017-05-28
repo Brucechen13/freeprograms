@@ -1,0 +1,24 @@
+create table users(
+	id INT NOT NULL AUTO_INCREMENT,
+ 	phoneno varchar(20)  NOT  NULL, 
+	password varchar(40)  NOT  NULL,
+	username varchar(40), 
+	gender   varchar(40) ,
+	age      varchar(40) ,
+	address  varchar(200),
+	career   varchar(40) ,
+   PRIMARY KEY ( id )
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+create table activities(
+   actid INT NOT NULL AUTO_INCREMENT,
+   title VARCHAR(100) NOT NULL,
+   content VARCHAR(4000) NOT NULL,
+   time VARCHAR(100) NOT NULL,
+   city VARCHAR(100) NOT NULL,
+   price VARCHAR(100) NOT NULL,
+   createtime timestamp not null default current_timestamp,  
+   useid INT NOT NULL,
+   PRIMARY KEY ( actid ),
+   FOREIGN KEY (useid) REFERENCES users(id)
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
