@@ -1,6 +1,7 @@
 import pymysql
 import json
 #Activity表结构 id, title, content, time, city，price，useid
+#活动分享数，评论数，关注数
 class Activity:
     def __init__(self, conn):
         self._conn = conn
@@ -26,6 +27,15 @@ class Activity:
                 return result
         except Exception as e:
             return json.dumps({'err':str(e)})
+    def shareActivity(self, actid):
+        try:
+            with self._conn.cursor() as cursor:
+                sql = "SELECT * FROM activities where starttime>Now() order by starttime"
+                cursor.execute(sql)        
+                self._conn.commit()  
+                return json.dumps({'success':'ok'})
+        except Exception as e:
+            return json.dumps({'err':str(e)})        
 
 #conn = pymysql.connect(host='127.0.0.1', port=3305, user='root', passwd='123456', db='test', charset='utf8')
 #act = Activity(conn)

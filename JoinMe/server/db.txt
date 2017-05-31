@@ -14,11 +14,87 @@ create table activities(
    actid INT NOT NULL AUTO_INCREMENT,
    title VARCHAR(100) NOT NULL,
    content VARCHAR(4000) NOT NULL,
-   time VARCHAR(100) NOT NULL,
+   starttime DATE NOT NULL,
+   endtime DATE NOT NULL,
    city VARCHAR(100) NOT NULL,
    price VARCHAR(100) NOT NULL,
    createtime timestamp not null default current_timestamp,  
+   followcount INT NOT NULL default 0,
+   commentcount INT NOT NULL default 0,
+   sharecount INT NOT NULL default 0,
    useid INT NOT NULL,
    PRIMARY KEY ( actid ),
    FOREIGN KEY (useid) REFERENCES users(id)
 )ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+create table msgs(
+   msgid INT NOT NULL AUTO_INCREMENT,
+   title VARCHAR(100) NOT NULL,
+   content VARCHAR(4000) NOT NULL,
+   createtime timestamp not null default current_timestamp,  
+   useid INT NOT NULL,
+   sharecount INT NOT NULL default 0,
+   commentcount INT NOT NULL default 0,
+   upcount INT NOT NULL default 0,
+   PRIMARY KEY ( msgid ),
+   FOREIGN KEY (useid) REFERENCES users(id)
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+create table msgcomments(
+	commentid INT NOT NULL AUTO_INCREMENT,
+	msgid INT NOT NULL,
+	type INT NOT NULL,
+	useid INT NOT NULL,
+   content VARCHAR(4000) NOT NULL,
+	createtime timestamp not null default current_timestamp,  
+	PRIMARY KEY ( commentid ),
+	FOREIGN KEY (useid) REFERENCES users(id),
+	FOREIGN KEY (msgid) REFERENCES msgs(msgid)
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+create table actscomments(
+	commentid INT NOT NULL AUTO_INCREMENT,
+	actid INT NOT NULL,
+	type INT NOT NULL,
+	useid INT NOT NULL,
+   content VARCHAR(4000) NOT NULL,
+	createtime timestamp not null default current_timestamp,  
+	PRIMARY KEY ( commentid ),
+	FOREIGN KEY (useid) REFERENCES users(id),
+	FOREIGN KEY (actid) REFERENCES activities(actid)
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+create table followacts(
+	followid INT NOT NULL AUTO_INCREMENT,
+	useid INT NOT NULL,
+	actid INT NOT NULL,
+	createtime timestamp not null default current_timestamp, 
+	PRIMARY KEY ( followid ),
+	FOREIGN KEY (useid) REFERENCES users(id),
+	FOREIGN KEY (actid) REFERENCES activities(actid)
+)ENGINE=InnoDB DEFAULT CHARSET=utf8;
+
+//创建触发器，在增加评论、关注的时候在对应的活动信息下的数字加1
+DROP TRIGGER IF EXISTS f_afterinsert_on_act;
+CREATE TRIGGER f_afterinsert_on_act
+AFTER INSERT ON followacts
+FOR EACH ROW
+BEGIN
+	  update activities set followcount=followcount+1 where actid = new.actid;
+END;
+
+DROP TRIGGER IF EXISTS c_afterinsert_on_act;
+CREATE TRIGGER c_afterinsert_on_act
+AFTER INSERT ON actscomments
+FOR EACH ROW
+BEGIN
+	  update activities set commentcount=commentcount+1 where actid = new.actid;
+END;
+
+DROP TRIGGER IF EXISTS c_afterinsert_on_msg;
+CREATE TRIGGER c_afterinsert_on_msg
+AFTER INSERT ON followacts
+FOR EACH ROW
+BEGIN
+	  update msgs set commentcount=commentcount+1 where msgid = new.msgid;
+END;
