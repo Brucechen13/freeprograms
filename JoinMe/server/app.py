@@ -49,19 +49,21 @@ def getUserInfo():
     else:
         return 'Hello John Doe'
 
-@app.route('/user/register')
+@app.route('/user/register', methods=['POST'])
 def registerUser():
     user = User(conn)
-    phone = request.args.get('phone')
-    password = request.args.get('password')
-    return jsonify(user.registerUser(phone, password))
-
-@app.route('/user/login')
+    params = json.loads(request.get_data().decode('utf-8'))
+    phone = params['phone']
+    password = params['password']
+    return jsonify(user.registerUser(phone, password))  
+ 
+@app.route('/user/login', methods=['POST'])
 def loginUser():
     user = User(conn)
-    phone = request.args.get('phone')
-    password = request.args.get('password')
-    return jsonify(user.loginUser(phone, password))    
+    params = json.loads(request.get_data().decode('utf-8'))
+    phone = params['phone']
+    password = params['password']
+    return jsonify(user.loginUser(phone, password))
 
 @app.route('/activity/getall')
 def getAllactivity():

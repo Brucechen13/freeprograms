@@ -25,7 +25,11 @@ class User:
                     cursor.execute(sql, (phoneNumber, password))
                     # 没有设置默认自动提交，需要主动提交，以保存所执行的语句
                     self._conn.commit()
-                    return json.dumps({'phone':phoneNumber})
+                    sql = 'select * from users where phoneno = %s and password = %s'
+                    cursor.execute(sql, (phoneNumber, password))
+                    result = cursor.fetchone()            
+                    self._conn.commit()
+                    return self.parseUser(result)
             except Exception:
                 return json.dumps({'err':'未知错误'})
             #finally:
