@@ -67,4 +67,4 @@ class User:
     #conn = pymysql.connect(host='127.0.0.1', port=3305, user='root', passwd='123456', db='test', charset='utf8')
 #conMysql()
 #user = User(conn)
-#print(user.getUser('18840884701'))
+#print(user.loginUser(182, 123))
