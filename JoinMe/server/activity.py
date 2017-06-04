@@ -17,7 +17,7 @@ class Activity:
                 return json.dumps({'success':'ok'})
         except Exception as e:
             return json.dumps({'err':str(e)})
-    def getActivity(self):
+    def showActivity(self, curTime, start, end):
         try:
             with self._conn.cursor() as cursor:
                 sql = "SELECT * FROM activities where starttime>Now() order by starttime"
@@ -27,6 +27,8 @@ class Activity:
                 return result
         except Exception as e:
             return json.dumps({'err':str(e)})
+    def showLatestActivity(self, curTime):
+        return 0
     def shareActivity(self, actid):
         try:
             with self._conn.cursor() as cursor:

@@ -2,6 +2,7 @@
 from flask import Flask, render_template,make_response, Response,request,jsonify
 import pymysql
 from user import User
+from activity import Activity
 
 #注册用户
 #获取用户信息
@@ -65,13 +66,20 @@ def loginUser():
     password = params['password']
     return jsonify(user.loginUser(phone, password))
 
-@app.route('/activity/getall')
+@app.route('/activity/getall', methods=['POST'])
 def getAllactivity():
     if userid in users:
         users = {'1':'john', '2':'steve', '3':'bill'}
         return jsonify({userid:users[userid]})
     else:
         return not_found() 
+
+@app.route('/activity/add', methods=['POST'])
+def addActivity():
+    act = Activity(conn)
+    params = json.loads(request.get_data().decode('utf-8'))
+    return act.addActivity(params['useId'], params['title'], params['content'],  
+                           params['starttime'], params['endtime'], params['city'], params['price'])  
 
 @app.errorhandler(404)
 def not_found(error=None):
