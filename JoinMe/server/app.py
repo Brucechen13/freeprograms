@@ -68,11 +68,9 @@ def loginUser():
 
 @app.route('/activity/getall', methods=['POST'])
 def getAllactivity():
-    if userid in users:
-        users = {'1':'john', '2':'steve', '3':'bill'}
-        return jsonify({userid:users[userid]})
-    else:
-        return not_found() 
+    act = Activity(conn)
+    params = json.loads(request.get_data().decode('utf-8'))
+    return jsonify(act.showActivity(params['start'], params['end']))
 
 @app.route('/activity/add', methods=['POST'])
 def addActivity():

@@ -5,6 +5,23 @@ import json
 class Activity:
     def __init__(self, conn):
         self._conn = conn
+        
+    def parseActivity(self, row):
+        activity = {}
+        names = ['actid', 'title', 'content', 'starttime', 'endtime', 'city', 'price', 'createtime']
+        for i in range(len(names)):
+            if row[i] != None:
+                activity[names[i]] = str(row[i])
+        user = {}
+        offset = len(names) + 1
+        user['id'] = str(row[offset + 0])  
+        user['phone'] = row[offset + 1]
+        names = ['username', 'gender', 'age', 'address', 'career']
+        for i in range(3,7):
+            if row[i] != None:
+                user[names[i-3]] = row[offset + i]  
+        activity['user'] = user
+        return activity    
     
     def addActivity(self, useId, title, content, starttime, endtime, city, price):
         try:            
@@ -17,24 +34,14 @@ class Activity:
                 return json.dumps({'success':'ok'})
         except Exception as e:
             return json.dumps({'err':str(e)})
-    def showActivity(self, curTime, start, end):
+    def showActivity(self, start, end):
         try:
             with self._conn.cursor() as cursor:
-                sql = "SELECT * FROM activities where starttime>Now() order by starttime limit %s, %s"
+                sql = "SELECT * FROM activities join users where starttime>Now() and activities.useid = users.id order by starttime limit %s, %s"
                 cursor.execute(sql, (start, end))
                 result = cursor.fetchall()            
                 self._conn.commit()  
-                return result
-        except Exception as e:
-            return json.dumps({'err':str(e)})
-    def showLatestActivity(self, curTime):
-        try:
-            with self._conn.cursor() as cursor:
-                sql = "SELECT * FROM activities where starttime>Now() starttime>%s and order by starttime"
-                cursor.execute(sql, (curTime))
-                result = cursor.fetchall()            
-                self._conn.commit()  
-                return result
+                return [self.parseActivity(row) for row in result]
         except Exception as e:
             return json.dumps({'err':str(e)})
     def shareActivity(self, actid):
@@ -49,5 +56,6 @@ class Activity:
 
 #conn = pymysql.connect(host='127.0.0.1', port=3305, user='root', passwd='123456', db='test', charset='utf8')
 #act = Activity(conn)
-#print(act.addActivity(1, '123', '456', '2017/6/1', '2017/6/2', 'beij', 'free'))
-#print((act.getActivity()))
+##print(act.addActivity(1, '123', '456', '2017/6/1', '2017/6/2', 'beij', 'free'))
+#import time
+#print((act.showActivity(time.ctime(), 0, 10)))
